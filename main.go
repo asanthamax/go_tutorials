@@ -2,8 +2,10 @@ package main
 
 import (
 	"fmt"
+	"net/http"
 
 	"github.com/gin-gonic/gin"
+	"github.com/joho/godotenv"
 	"tododemo.com/m/controllers"
 	"tododemo.com/m/middleware"
 	"tododemo.com/m/models"
@@ -11,7 +13,12 @@ import (
 
 func main() {
 	fmt.Print("Starting RESTful API server...\n")
+	err := godotenv.Load()
+	if err != nil {
+		fmt.Print("Error loading .env file, proceeding with environment variables\n")
+	}
 	router := gin.Default()
+	router.LoadHTMLGlob("templates/*")
 	router.SetTrustedProxies([]string{"localhost"})
 
 	models.ConnectDatabase()
@@ -26,6 +33,8 @@ func main() {
 	}
 	router.POST("/login", middleware.Login)
 	router.POST("/user/register", controllers.RegisterUser)
+	http.HandleFunc("/oauth/google/login", controllers.HandleGoogleLogin)
+	router.GET("/oauth/google/callback", controllers.HandleGoogleCallback)
 
 	router.NoRoute(func(c *gin.Context) {
 		c.JSON(404, gin.H{"message": "Route not found", "code": "PAGE_NOT_FOUND"})

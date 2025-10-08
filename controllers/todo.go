@@ -10,7 +10,9 @@ import (
 )
 
 func HomePage(context *gin.Context) {
-	context.JSON(http.StatusOK, gin.H{"message": "Welcome to the ToDo API", "status": "success"})
+	context.HTML(http.StatusOK, "index.html", gin.H{
+		"title": "Todo App",
+	})
 }
 
 func GetTodos(context *gin.Context) {
